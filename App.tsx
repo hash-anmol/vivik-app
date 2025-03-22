@@ -1,34 +1,47 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Image } from 'react-native';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import * as SplashScreen from 'expo-splash-screen';
+import * as Font from 'expo-font';
+import { Asset } from 'expo-asset';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const [isLoading, setIsLoading] = useState(true);
-  
+  const [appIsReady, setAppIsReady] = useState(false);
+
   useEffect(() => {
-    // Simulate loading time for the splash screen
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 2000); // Show splash screen for 2 seconds
+    async function prepare() {
+      try {
+        // Pre-load fonts, images, etc.
+        await Asset.loadAsync([require('./assets/vivik_logo.png')]);
+        // Artificially delay for demonstration
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
   }, []);
 
-  // Splash Screen
-  if (isLoading) {
-    return (
-      <View style={styles.splashContainer}>
-        <Image 
-          source={require('./assets/vivik_logo.png')} 
-          style={styles.logo}
-          resizeMode="contain"
-        />
-        <StatusBar style="light" />
-      </View>
-    );
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      // This tells the splash screen to hide immediately
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
+
+  if (!appIsReady) {
+    return null;
   }
 
-  // Main Screen (after splash)
   return (
-    <View style={styles.container}>
+    <View style={styles.container} onLayout={onLayoutRootView}>
       <Text style={styles.text}>Hello World</Text>
       <StatusBar style="light" />
     </View>
@@ -36,21 +49,11 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  splashContainer: {
-    flex: 1,
-    backgroundColor: '#0047AB', // Rich blue color
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   container: {
     flex: 1,
     backgroundColor: 'blue',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  logo: {
-    width: '70%',
-    height: '70%',
   },
   text: {
     color: 'white',
