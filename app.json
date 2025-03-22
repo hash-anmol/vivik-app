@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/vivik_logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0047AB"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true

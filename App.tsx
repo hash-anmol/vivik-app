@@ -16,8 +16,7 @@ export default function App() {
       try {
         // Pre-load fonts, images, etc.
         await Asset.loadAsync([require('./assets/vivik_logo.png')]);
-        // Artificially delay for demonstration
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Remove artificial delay
       } catch (e) {
         console.warn(e);
       } finally {
@@ -42,8 +41,13 @@ export default function App() {
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
+      <Image 
+        source={require('./assets/vivik_logo.png')} 
+        style={styles.logo}
+        resizeMode="contain"
+      />
       <Text style={styles.text}>Hello World</Text>
-      <StatusBar style="light" />
+      <StatusBar style="dark" />
     </View>
   );
 }
@@ -51,12 +55,17 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'blue',
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  logo: {
+    width: '70%',
+    height: '30%',
+    marginBottom: 20,
+  },
   text: {
-    color: 'white',
+    color: 'black',
     fontSize: 24,
   },
 });
