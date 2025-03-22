@@ -1,35 +1,56 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-// Import screens
-import SplashScreenComponent from './src/screens/SplashScreen';
-import HomeScreen from './src/screens/HomeScreen';
+// Import navigation
+import AppNavigator from './app/navigation/AppNavigator';
+
+// Import context
+import { OnboardingProvider } from './app/context/OnboardingContext';
+import { UserDataProvider } from './app/context/UserDataContext';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
 
-  // Handle splash screen finish
-  const onSplashFinish = useCallback(() => {
-    setAppIsReady(true);
+  useEffect(() => {
+    async function prepare() {
+      try {
+        // No assets to preload for now
+      } catch (e) {
+        console.warn('Error loading assets:', e);
+      } finally {
+        // Tell the application to render
+        setAppIsReady(true);
+      }
+    }
+
+    prepare();
   }, []);
 
-  // Handle layout for hiding splash screen
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
+      // This tells the splash screen to hide immediately
       await SplashScreen.hideAsync();
     }
   }, [appIsReady]);
 
-  // Render splash screen component
   if (!appIsReady) {
-    return <SplashScreenComponent onFinish={onSplashFinish} />;
+    return null;
   }
 
-  // Render main app once ready
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
-      <HomeScreen />
-    </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <OnboardingProvider>
+        <UserDataProvider>
+          <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+            <AppNavigator />
+          </View>
+        </UserDataProvider>
+      </OnboardingProvider>
+    </GestureHandlerRootView>
   );
 }

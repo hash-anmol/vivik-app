@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import { Asset } from 'expo-asset';
 
 // Keep splash screen visible
 SplashScreen.preventAutoHideAsync();
@@ -15,8 +14,7 @@ const SplashScreenComponent: React.FC<SplashScreenProps> = ({ onFinish }) => {
   useEffect(() => {
     async function prepare() {
       try {
-        // Pre-load assets
-        await Asset.loadAsync([require('../../assets/vivik_logo.png')]);
+        // No assets to pre-load for now
       } catch (e) {
         console.warn('Error loading assets:', e);
       } finally {
