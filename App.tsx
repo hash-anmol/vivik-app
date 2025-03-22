@@ -1,71 +1,35 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Image } from 'react-native';
-import { useEffect, useState, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
+import { View } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import * as Font from 'expo-font';
-import { Asset } from 'expo-asset';
 
-// Keep the splash screen visible while we fetch resources
-SplashScreen.preventAutoHideAsync();
+// Import screens
+import SplashScreenComponent from './src/screens/SplashScreen';
+import HomeScreen from './src/screens/HomeScreen';
 
 export default function App() {
   const [appIsReady, setAppIsReady] = useState(false);
 
-  useEffect(() => {
-    async function prepare() {
-      try {
-        // Pre-load fonts, images, etc.
-        await Asset.loadAsync([require('./assets/vivik_logo.png')]);
-        // Remove artificial delay
-      } catch (e) {
-        console.warn(e);
-      } finally {
-        // Tell the application to render
-        setAppIsReady(true);
-      }
-    }
-
-    prepare();
+  // Handle splash screen finish
+  const onSplashFinish = useCallback(() => {
+    setAppIsReady(true);
   }, []);
 
+  // Handle layout for hiding splash screen
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady) {
-      // This tells the splash screen to hide immediately
       await SplashScreen.hideAsync();
     }
   }, [appIsReady]);
 
+  // Render splash screen component
   if (!appIsReady) {
-    return null;
+    return <SplashScreenComponent onFinish={onSplashFinish} />;
   }
 
+  // Render main app once ready
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
-      <Image 
-        source={require('./assets/vivik_logo.png')} 
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.text}>Hello World</Text>
-      <StatusBar style="dark" />
+    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <HomeScreen />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logo: {
-    width: '70%',
-    height: '30%',
-    marginBottom: 20,
-  },
-  text: {
-    color: 'black',
-    fontSize: 24,
-  },
-});
